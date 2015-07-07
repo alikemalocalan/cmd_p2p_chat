@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Main {
+public class server {
     public static Scanner input = new Scanner(System.in);
 
     public static String kullanici,admin;
@@ -34,7 +34,7 @@ public class Main {
 
 
         try {
-            Main s= new Main();
+            server s= new server();
             s.baglan();
         } catch (IOException ex) {
 
