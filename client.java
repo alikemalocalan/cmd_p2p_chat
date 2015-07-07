@@ -16,8 +16,10 @@ public class client {
         DataInputStream read = new DataInputStream(soket.getInputStream()); // Bana mesaj gelecegi icin DataInputStream i kullandim.
         //Mesaj Gonderecek olsam DataOutputStreami kullanirdim.
 
-        String okunanMesaj = read.readUTF(); // gelen mesaji okuduk.
-        System.out.println(okunanMesaj);
+        while(true){
+            String okunanMesaj = read.readUTF(); // gelen mesaji okuduk.
+            System.out.println(okunanMesaj);
+        }
     }
     public static void main(String[] args) throws ClassNotFoundException {
         client cl = new client();
