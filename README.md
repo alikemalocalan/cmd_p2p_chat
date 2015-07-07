@@ -1,2 +1,7 @@
-# cmd_p2p_chat
-komut satırından ananonim mesajlasma
+
+#komut satırından ananonim mesajlasma
+
+eksikler:
+-aynı anda hem mesaj yazıp hem mesaj dinleme
+-sifreleme
+-kullanıcı tanımlama
