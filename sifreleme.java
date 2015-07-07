@@ -28,11 +28,11 @@ public class sifreleme {
         return decryptedValue;
     }
     public static void main(String[] args) throws Exception {
-        String password = "mypassword";
-        String passwordEnc = sifreleme.encrypt(password);
+        String mesaj = "mypassword";
+        String passwordEnc = sifreleme.encrypt(mesaj);
         String passwordDec = sifreleme.decrypt(passwordEnc);
 
-        System.out.println("Plain Text : " + password);
+        System.out.println("Plain Text : " + mesaj);
         System.out.println("Encrypted Text : " + passwordEnc);
         System.out.println("Decrypted Text : " + passwordDec);
     }
