@@ -102,7 +102,7 @@ public class server {
         try {
             System.out.println("Kullanici adiniz: ");
             admin= input.next();
-            ServerSocket server = new ServerSocket(42222); //2347 portu dinlenilmeye
+            ServerSocket server = new ServerSocket(42222); // portu dinlenilmeye
 
             System.out.println("Client Bekleniyor");
             Socket client=server.accept(); // Su an bize client  bekliyoruz.
@@ -112,16 +112,11 @@ public class server {
 
             read = new DataInputStream(client.getInputStream());
             write = new DataOutputStream(client.getOutputStream()); //Clienta mesaj yollamak icin
-            //Eger ki mesaj alsaydik DataInputStream  kullanacaktik.
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        /*while(true){//Mesaj karsiya ulasti
-
-            String mesaj = input.next();
-            write.writeUTF(admin + " : " + mesaj + "\n");
-        }*/
         mesaj_oku oku= new mesaj_oku();
         oku.start();
         mesaj_gonder gonder=new mesaj_gonder();
