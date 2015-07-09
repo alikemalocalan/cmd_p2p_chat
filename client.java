@@ -32,24 +32,12 @@ class sifreleme {
         String decryptedValue = new String(decValue);
         return decryptedValue;
     }
-    public static void main(String[] args) throws Exception {
-
-    }
 }
-
-
 class mesaj_oku extends Thread {
-
-    mesaj_oku() {
-
-        }
-
     public void run() {
         client s = new client();
         sifreleme cryto = new sifreleme();
-
         try {
-
             while(true){//Mesaj karsiya ulasti
                 String okunanMesaj = cryto.decrypt(s.read.readUTF()); // gelen mesaji okuduk.
                 System.out.println(okunanMesaj);
@@ -57,34 +45,23 @@ class mesaj_oku extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 }
 class mesaj_gonder extends Thread {
     public static Scanner input = new Scanner(System.in);
-    mesaj_gonder() {
-
-    }
-
     public void run() {
         client s = new client();
         sifreleme cryto = new sifreleme();
-
         try {
             while(true){//Mesaj karsiya ulasti
                 String mesaj = input.next();
                 s.write.writeUTF(cryto.encrypt(s.kullanici+" : " +mesaj + "\n"));
-
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 }
-
 public class client{
     public static Scanner input = new Scanner(System.in);
 
@@ -93,17 +70,14 @@ public class client{
     public static DataInputStream read;
 
     public static void main(String args[]) throws IOException {
-
         try {
             System.out.println("Kullanici adiniz: ");
             kullanici= input.next();
             
             String ip="127.0.0.1"; // Hangi servera baglanmak istedigimizi yaziyoruz. Ben local deki baglanacagim
-
             Socket soket = new Socket(ip, 42222); //Servera baglandim.
             read = new DataInputStream(soket.getInputStream());
             write = new DataOutputStream(soket.getOutputStream()); //Clienta mesaj yollamak icin
-            
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("port baglanmadı");
@@ -112,7 +86,6 @@ public class client{
         oku.start();
         mesaj_gonder gonder = new mesaj_gonder();
         gonder.start();
-
     }
 
 }
