@@ -1,4 +1,4 @@
-package com.company;
+package com.serverapps;
 
 import java.io.*;
 import java.net.Socket;
@@ -62,7 +62,7 @@ class mesaj_gonder extends Thread {
         }
     }
 }
-public class client{
+class client{
     public static Scanner input = new Scanner(System.in);
 
     public static String kullanici;
@@ -73,7 +73,7 @@ public class client{
         try {
             System.out.println("Kullanici adiniz: ");
             kullanici= input.next();
-            
+
             String ip="127.0.0.1"; // Hangi servera baglanmak istedigimizi yaziyoruz. Ben local deki baglanacagim
             Socket soket = new Socket(ip, 42222); //Servera baglandim.
             read = new DataInputStream(soket.getInputStream());
