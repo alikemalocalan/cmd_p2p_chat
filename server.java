@@ -3,7 +3,6 @@ package com.serverapps;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
@@ -36,92 +35,57 @@ class sifreleme {
         String decryptedValue = new String(decValue);
         return decryptedValue;
     }
-    public static void main(String[] args) throws Exception {
-
-    }
 }
 class mesaj_oku extends Thread {
-
-    mesaj_oku() {
-
-    }
-
     public void run() {
-        server s = new server();
-        sifreleme cryto = new sifreleme();
-
-        try {
-
-            while(true){//Mesaj karsiya ulasti
-                String okunanMesaj = cryto.decrypt(s.read.readUTF()); // gelen mesaji okuduk.
-                System.out.println(okunanMesaj);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    server s = new server();
+    sifreleme cryto = new sifreleme();
+    try {
+        while(true){//Mesaj karsiya ulasti
+            String okunanMesaj = cryto.decrypt(s.read.readUTF()); // gelen mesaji okuduk.
+            System.out.println(okunanMesaj);
         }
-
-
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-}
-
+}}
 class mesaj_gonder extends Thread {
     public static Scanner input = new Scanner(System.in);
-    mesaj_gonder() {
-
-    }
-
     public void run() {
-        server s = new server();
-        sifreleme cryto = new sifreleme();
-
-
-
-        try {
-            while(true){//Mesaj karsiya ulasti
-                String mesaj = input.next();
-                s.write.writeUTF(cryto.encrypt(s.admin+" : " + mesaj + "\n"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    server s = new server();
+    sifreleme cryto = new sifreleme();
+    try {
+        while(true){//Mesaj karsiya ulasti
+            String mesaj = input.next();
+            s.write.writeUTF(cryto.encrypt(s.admin+" : " + mesaj + "\n"));
         }
-
-
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-}
-
-public class server {
+}}
+class server {
     public static Scanner input = new Scanner(System.in);
-
     public static String kullanici,admin;
     public static DataOutputStream write;
     public static DataInputStream read;
-
-
 
     public static void main(String[] args) throws IOException {
         try {
             System.out.println("Kullanici adiniz: ");
             admin= input.next();
             ServerSocket server = new ServerSocket(42222); // portu dinlenilmeye
-
             System.out.println("Client Bekleniyor");
             Socket client=server.accept(); // Su an bize client  bekliyoruz.
-
             System.out.println("Client baglandi "+client.getLocalAddress()); // Client baglandi
-
 
             read = new DataInputStream(client.getInputStream());
             write = new DataOutputStream(client.getOutputStream()); //Clienta mesaj yollamak icin
-            
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         mesaj_oku oku= new mesaj_oku();
         oku.start();
         mesaj_gonder gonder=new mesaj_gonder();
         gonder.start();
-
     }
-
 }
