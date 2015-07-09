@@ -1,5 +1,3 @@
-package com.serverapps;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -64,7 +62,6 @@ class mesaj_gonder extends Thread {
 }
 class client{
     public static Scanner input = new Scanner(System.in);
-
     public static String kullanici;
     public static DataOutputStream write;
     public static DataInputStream read;
@@ -87,5 +84,4 @@ class client{
         mesaj_gonder gonder = new mesaj_gonder();
         gonder.start();
     }
-
 }
