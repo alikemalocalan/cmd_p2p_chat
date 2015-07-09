@@ -81,9 +81,7 @@ class server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mesaj_oku oku= new mesaj_oku();
-        oku.start();
-        mesaj_gonder gonder=new mesaj_gonder();
-        gonder.start();
+        new mesaj_oku().start();
+        new mesaj_gonder().start();
     }
 }
