@@ -1,6 +1,11 @@
 
-#komut satırından ananonim mesajlasma
+#Basit ananonim mesajlasma
 
+eksikleri;
 
-farklı cıhazları baglamak  için modemde port açmanız gerekebilir
+Bas-konus tusuna kısayok atama
+
+Çoklu kullanıcı desteği
+
+Farklı cıhazları baglamak  için modemde port açmanız gerekebilir
 
