@@ -3,7 +3,7 @@
 
 eksikleri;
 
-Bas-konus tusuna kısayok atama
+Bas-konus tusuna kısayol atama
 
 Çoklu kullanıcı desteği
 
