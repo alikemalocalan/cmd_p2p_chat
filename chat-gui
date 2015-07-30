@@ -11,7 +11,6 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 
-
 class sifreleme {
     public static String secret = "theBestSecretKey";
     private static final String ALGO = "AES";
@@ -26,19 +25,26 @@ class sifreleme {
         return new String(c.doFinal(new BASE64Decoder().decodeBuffer(encryptedData)));
     }
 }
-
 class client extends JPanel{
     public static DataOutputStream write;
-    public static String read;
-    public static DefaultListModel model;
+    public static DataInputStream read;
     public static JTextArea mesajarea;
-
     client() throws Exception {
-
         setLayout(new BorderLayout());
         mesajarea = new JTextArea(8,40);
         mesajarea.setEditable(false);
-        //mesaj gonderme kutusu
+        Thread worker = new Thread() {
+            public void run() {
+                try {
+                    while(true){
+                        mesajarea.append(new sifreleme().decrypt(read.readUTF()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.start();
         JTextField mesajgonder= new JTextField("mesaj yazin");
         mesajgonder.addMouseListener(new MouseInputListener() {
             @Override
@@ -78,10 +84,9 @@ class client extends JPanel{
             }
         });
         mesajgonder.addActionListener(actionEvent -> {
-
             try {
+                write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()+"\n"));
                 mesajarea.append("Kullanici" + " : " + mesajgonder.getText()+"\n");
-                //write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()));
                 mesajgonder.setText("");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -90,40 +95,36 @@ class client extends JPanel{
         //butonlar
         JButton addButton = new JButton("Gonder");
         JButton removeButton = new JButton("temizle");
+        JButton sesgonder = new JButton("Bas-Konus");
         addButton.addActionListener(e -> {
             try {
-                mesajarea.append("Kullanici" + " : " + mesajgonder.getText()+"\n");
-                //write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()+"\n"));
+                write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()+"\n"));
+                mesajarea.append("Kullanici" + " : " + mesajgonder.getText() + "\n");
                 mesajgonder.setText("");
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
         });
-        removeButton.addActionListener(e -> model.clear());
+        removeButton.addActionListener(e -> mesajarea.removeAll());
         add(new JScrollPane(mesajarea), BorderLayout.NORTH);
         add(addButton, BorderLayout.EAST);
         add(removeButton, BorderLayout.WEST);
         add(mesajgonder, BorderLayout.CENTER);
     }
-
     public static void main(String args[]) throws Exception {
-        /*try {
+        try {
             Socket soket = new Socket(JOptionPane.showInputDialog("Baglanilacak sunucu"), 42222);
-            read = new DataInputStream(soket.getInputStream()).readUTF();
+            read = new DataInputStream(soket.getInputStream());
             write = new DataOutputStream(soket.getOutputStream());
         }
         catch (Exception e1) {
             e1.printStackTrace();
-        }*/
+        }
         JFrame frame= new JFrame("Sifreli chat");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(new client());
         frame.setSize(690, 250);
         frame.setVisible(true);
         frame.setResizable(false);
-
         }
-
 }
-
-
