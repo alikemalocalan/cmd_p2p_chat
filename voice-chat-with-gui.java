@@ -1,6 +1,8 @@
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import java.awt.BorderLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -32,11 +34,50 @@ class client extends JPanel{
     public static DataOutputStream write;
     public static DataInputStream read;
     public static JTextArea mesajarea;
+    public static JTextField mesajgonder;
 
     client() throws Exception {
         setLayout(new BorderLayout());
         mesajarea = new JTextArea(8,40);
         mesajarea.setEditable(false);
+        mesajgonder= new JTextField("mesaj yazin");
+        JButton addButton = new JButton("Gonder");
+        JButton removeButton = new JButton("temizle");
+        JButton sesgonder = new JButton("Bas-Konus");
+        
+        
+        mesajgonder.addMouseListener(new MouseInputListener() {
+            @Override
+            public void mouseDragged(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                mesajgonder.setText("");
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+            }
+        });
+        mesajgonder.addActionListener(actionEvent -> mesajgonder());
+        //butonlar
         Thread worker = new Thread() {
             public void run() {
                 try {
@@ -49,54 +90,31 @@ class client extends JPanel{
             }
         };
         worker.start();
-        JTextField mesajgonder= new JTextField("mesaj yazin");
-        mesajgonder.addMouseListener(new MouseInputListener() {
-            @Override
-            public void mouseDragged(MouseEvent mouseEvent) {
-            }
-            @Override
-            public void mouseMoved(MouseEvent mouseEvent) {
-            }
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-                mesajgonder.setText("");
-            }
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-            }
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-            }
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-            }
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-            }
-        });
-        mesajgonder.addActionListener(actionEvent -> {
-            try {
-                //write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()+"\n"));
-                mesajarea.append("Kullanici" + " : " + mesajgonder.getText()+"\n");
-                mesajgonder.setText("");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        //butonlar
-        JButton addButton = new JButton("Gonder");
-        JButton removeButton = new JButton("temizle");
-        JButton sesgonder = new JButton("Bas-Konus");
-        addButton.addActionListener(e -> {
-            try {
-                //write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()+"\n"));
-                mesajarea.append("Kullanici" + " : " + mesajgonder.getText() + "\n");
-                mesajgonder.setText("");
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        });
+        
+        addButton.addActionListener(e -> mesajgonder());
         removeButton.addActionListener(e -> mesajarea.removeAll());
+        sesgonder.addKeyListener( new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+                if (keyEvent.getKeyCode() == KeyEvent.VK_ALT) {
+                    microfonuac();
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+                if (keyEvent.getKeyCode() == KeyEvent.VK_ALT) {
+                    microfonuac();
+                    System.out.println("Alt tusuna basildi");
+                }
+            }
+            @Override
+            public void keyReleased (KeyEvent keyEvent){
+                if (keyEvent.getKeyCode() == KeyEvent.VK_ALT) {
+                    microfonuac();
+                }
+            }
+        });
         sesgonder.addMouseListener(new MouseInputListener() {
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
@@ -122,38 +140,42 @@ class client extends JPanel{
 
             @Override
             public void mouseEntered(MouseEvent mouseEvent) {
-                Thread microfonac = new Thread() {
-                    public void run() {
-                        try {
-                            microfon.start();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                microfonac.start();
+                microfonuac();
             }
 
             @Override
             public void mouseExited(MouseEvent mouseEvent) {
-                Thread microfonkapa = new Thread() {
-                    public void run() {
-                        try {
-                            microfon.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                microfonkapa.start();
+                mikrofonukapa();
             }
         });
-
         add(new JScrollPane(mesajarea), BorderLayout.NORTH);
         add(addButton, BorderLayout.EAST);
-        add(removeButton, BorderLayout.WEST);
+        //add(removeButton, BorderLayout.WEST);
         add(sesgonder, BorderLayout.WEST);
         add(mesajgonder, BorderLayout.CENTER);
+    }
+    private void mesajgonder() {
+        try {
+            //write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()+"\n"));
+            mesajarea.append("Kullanici" + " : " + mesajgonder.getText() + "\n");
+            mesajgonder.setText("");
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+    private void mikrofonukapa() {
+        try {
+            microfon.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void microfonuac() {
+        try {
+            microfon.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public static void main(String args[]) throws Exception {
         try {
@@ -185,7 +207,7 @@ class client extends JPanel{
             if(bytesRead>= 0){
                 dos.write(soundData,0,bytesRead);
             }
-        }System.out.println("ses gelmiyor");
+        }System.out.println("islem taaamam");
         }
 }
 class SoundReceiver implements Runnable{
@@ -216,4 +238,3 @@ class SoundReceiver implements Runnable{
         }
     }
 }
-
