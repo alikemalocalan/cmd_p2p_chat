@@ -26,9 +26,9 @@ class sifreleme {
     }
 }
 class client extends JPanel{
-    public static DataOutputStream write;
-    public static DataInputStream read;
-    public static JTextArea mesajarea;
+    static DataOutputStream write;
+    static DataInputStream read;
+    static JTextArea mesajarea;
     client() throws Exception {
         setLayout(new BorderLayout());
         mesajarea = new JTextArea(8,40);
@@ -126,5 +126,5 @@ class client extends JPanel{
         frame.setSize(690, 250);
         frame.setVisible(true);
         frame.setResizable(false);
-        }
+    }
 }
