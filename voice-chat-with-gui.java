@@ -1,9 +1,7 @@
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
-import java.awt.BorderLayout;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,9 +11,8 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
-
 class sifreleme {
-    public static String secret = "theBestSecretKey";
+    public static String secret = "theBestSecretKey"; //16 haneli sifre secmelisiniz
     private static final String ALGO = "AES";
     String encrypt(String Data) throws Exception {
         Cipher c = Cipher.getInstance(ALGO);
@@ -30,22 +27,22 @@ class sifreleme {
 }
 class client extends JPanel{
     public static Socket soket;
-    public static TargetDataLine microfon;
-    public static DataOutputStream write;
-    public static DataInputStream read;
-    public static JTextArea mesajarea;
-    public static JTextField mesajgonder;
+    public static Socket soketses;
+    public static TargetDataLine microfon=null;
+    public static AudioFormat af = new AudioFormat(8000,8,1,true,false);
+    DataOutputStream write = new DataOutputStream(soket.getOutputStream());
+    DataInputStream read = new DataInputStream(soket.getInputStream());
+    static JTextArea mesajarea;
+    JTextField mesajgonder;
 
     client() throws Exception {
         setLayout(new BorderLayout());
-        mesajarea = new JTextArea(8,40);
-        mesajarea.setEditable(false);
-        mesajgonder= new JTextField("mesaj yazin");
         JButton addButton = new JButton("Gonder");
         JButton removeButton = new JButton("temizle");
         JButton sesgonder = new JButton("Bas-Konus");
-        
-        
+        mesajarea = new JTextArea(8,40);
+        mesajarea.setEditable(false);
+        mesajgonder= new JTextField("mesaj yazin");
         mesajgonder.addMouseListener(new MouseInputListener() {
             @Override
             public void mouseDragged(MouseEvent mouseEvent) {
@@ -77,23 +74,10 @@ class client extends JPanel{
             }
         });
         mesajgonder.addActionListener(actionEvent -> mesajgonder());
-        //butonlar
-        Thread worker = new Thread() {
-            public void run() {
-                try {
-                    while(true){
-                        //mesajarea.append(new sifreleme().decrypt(read.readUTF()));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        worker.start();
-        
+
         addButton.addActionListener(e -> mesajgonder());
         removeButton.addActionListener(e -> mesajarea.removeAll());
-        sesgonder.addKeyListener( new KeyListener() {
+        sesgonder.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent keyEvent) {
                 if (keyEvent.getKeyCode() == KeyEvent.VK_ALT) {
@@ -108,8 +92,9 @@ class client extends JPanel{
                     System.out.println("Alt tusuna basildi");
                 }
             }
+
             @Override
-            public void keyReleased (KeyEvent keyEvent){
+            public void keyReleased(KeyEvent keyEvent) {
                 if (keyEvent.getKeyCode() == KeyEvent.VK_ALT) {
                     microfonuac();
                 }
@@ -149,15 +134,27 @@ class client extends JPanel{
             }
         });
         add(new JScrollPane(mesajarea), BorderLayout.NORTH);
-        add(addButton, BorderLayout.EAST);
-        //add(removeButton, BorderLayout.WEST);
+        add(addButton, BorderLayout.AFTER_LINE_ENDS);
         add(sesgonder, BorderLayout.WEST);
         add(mesajgonder, BorderLayout.CENTER);
+        add(removeButton,BorderLayout.EAST);
+        Thread worker = new Thread() {
+            public void run() {
+                try {
+                    while(true){
+                        mesajarea.append(new sifreleme().decrypt(read.readUTF()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.start();
     }
     private void mesajgonder() {
         try {
-            //write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + mesajgonder.getText()+"\n"));
-            mesajarea.append("Kullanici" + " : " + mesajgonder.getText() + "\n");
+            write.writeUTF(new sifreleme().encrypt("SERVER MESAJİ" + " : " + mesajgonder.getText()+"\n"));
+            mesajarea.append("SERVER MESAJİ" + " : " + mesajgonder.getText() + "\n");
             mesajgonder.setText("");
         } catch (Exception e1) {
             e1.printStackTrace();
@@ -165,7 +162,7 @@ class client extends JPanel{
     }
     private void mikrofonukapa() {
         try {
-            microfon.close();
+            microfon.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -178,49 +175,41 @@ class client extends JPanel{
         }
     }
     public static void main(String args[]) throws Exception {
+        String ip =JOptionPane.showInputDialog("Baglanilacak sunucu");
         try {
-            soket = new Socket(JOptionPane.showInputDialog("Baglanilacak sunucu"), 43333);
-            read = new DataInputStream(soket.getInputStream());
-            write = new DataOutputStream(soket.getOutputStream());
+            soket = new Socket(ip,43333);
         }
         catch (Exception e1) {
             e1.printStackTrace();
-            soket.close();
             System.out.println("baglanti koptu");
         }
-        JFrame frame= new JFrame("Sifreli chat");
+        soketses= new Socket(ip,42222);
+        JFrame frame= new JFrame("Sifreli chat-Server");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(new client());
         frame.setSize(690, 250);
         frame.setVisible(true);
         frame.setResizable(false);
-        AudioFormat af = new AudioFormat(8000,8,1,true,false);
-        DataLine.Info info = new DataLine.Info(TargetDataLine.class,af);
-        microfon = (TargetDataLine) AudioSystem.getLine(info);
+
+        microfon = (TargetDataLine) AudioSystem.getLine(new DataLine.Info(TargetDataLine.class,af));
         microfon.open(af);
-        DataOutputStream dos = new DataOutputStream(soket.getOutputStream());
+        DataOutputStream dos = new DataOutputStream(soketses.getOutputStream());
         int bytesRead=0;
         byte[] soundData= new byte[1];
-        new Thread(new SoundReceiver(soket)).start();
+        new Thread(new SoundReceiver()).start();
         while(bytesRead!= -1){
             bytesRead = microfon.read(soundData,0,soundData.length);
             if(bytesRead>= 0){
                 dos.write(soundData,0,bytesRead);
             }
-        }System.out.println("islem taaamam");
         }
+    }
 }
 class SoundReceiver implements Runnable{
-    DataInputStream soundIn =null;
-    static SourceDataLine inSpeaker= null;
-
-    public SoundReceiver(Socket conn) throws IOException, LineUnavailableException {
-        Socket socket = conn;
-        soundIn = new DataInputStream(socket.getInputStream());
-        AudioFormat af = new AudioFormat(8000,8,1,true,false);
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class,af);
-        inSpeaker = (SourceDataLine) AudioSystem.getLine(info);
-        inSpeaker.open(af);
+    SourceDataLine inSpeaker= null;
+    public SoundReceiver() throws IOException, LineUnavailableException {
+        inSpeaker = (SourceDataLine) AudioSystem.getLine(new DataLine.Info(SourceDataLine.class,client.af));
+        inSpeaker.open(client.af);
     }
     public void run(){
         int bytesRead= 0;
@@ -228,7 +217,7 @@ class SoundReceiver implements Runnable{
         inSpeaker.start();
         while(bytesRead!= -1){
             try {
-                bytesRead = soundIn.read(insound,0,insound.length);
+                bytesRead = new DataInputStream(client.soketses.getInputStream()).read(insound, 0, insound.length);
             } catch (IOException e) {
                 e.printStackTrace();
             }
