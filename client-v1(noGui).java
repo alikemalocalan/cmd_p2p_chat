@@ -27,7 +27,7 @@ class mesaj_oku extends Thread {
     public void run(){
         while(true){//Mesaj karsiya ulasti
             try {
-                System.out.println(new sifreleme().decrypt(new client().read.readUTF()));
+                System.out.println(new sifreleme().decrypt(client.read.readUTF()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -38,7 +38,7 @@ class mesaj_gonder extends Thread {
     public void run() {
         while(true){//Mesaj karsiya ulasti
             try {
-                new client().write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + new Scanner(System.in).next() + "\n"));
+                client.write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + new Scanner(System.in).next() + "\n"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
