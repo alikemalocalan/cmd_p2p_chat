@@ -1,14 +1,12 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.security.Key;
-import java.util.Scanner;
 
 class sifreleme {
     public static String secret = "theBestSecretKey";
@@ -27,13 +25,11 @@ class sifreleme {
 }
 class mesaj_oku extends Thread {
     public void run(){
-        while(true){
+        while(true){//Mesaj karsiya ulasti
             try {
-                System.out.println(new sifreleme().decrypt(new server().read.readUTF()));
+                System.out.println(new sifreleme().decrypt(client.read.readUTF()));
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("kapatmak için bekleniyor");
-                new Scanner(System.in).next();
             }
         }
     }
@@ -42,32 +38,23 @@ class mesaj_gonder extends Thread {
     public void run() {
         while(true){//Mesaj karsiya ulasti
             try {
-                new server().write.writeUTF(new sifreleme().encrypt("SERVER MESAJ" + " : " + new Scanner(System.in).next() + "\n"));
+                client.write.writeUTF(new sifreleme().encrypt("Kullanici" + " : " + new Scanner(System.in).next() + "\n"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 }
-class server {
-    public static DataInputStream read;
+class client{
     public static DataOutputStream write;
-    public static Socket client;
+    public static DataInputStream read;
 
-    public static void main(String[] args) throws Exception {
-        try {
-            client=new ServerSocket(42222).accept();
-            System.out.println(client.getLocalAddress());
-            read = new DataInputStream(client.getInputStream());
-            write= new DataOutputStream(client.getOutputStream());
-        }
-
-         catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    public static void main(String args[]) throws IOException {
+        Socket soket = new Socket("127.0.0.1", 42222); //Servera baglandim.
+        read = new DataInputStream(soket.getInputStream());
+        write = new DataOutputStream(soket.getOutputStream()); //Clienta mesaj yollamak icin
+        //Eger ki mesaj alsaydik DataInputStream  kullanacaktik.
         new mesaj_oku().start();
         new mesaj_gonder().start();
-
-}
+    }
 }
